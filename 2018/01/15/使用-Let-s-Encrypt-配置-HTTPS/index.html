@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <meta name="robots" content="index, follow">
+  <!-- title -->
+  
+    
+  <title>使用 Let&#39;s Encrypt 配置 HTTPS - Random Access</title>
+    
+  
+  
+  <!-- open graph -->
+  <meta name="description" content="HTTPS是一种更安全的访问网页的方式。简单介绍一下使用Let’s Encrypt来配置HTTPS。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 Let&#39;s Encrypt 配置 HTTPS">
+<meta property="og:url" content="http://blog.xubihang.name/2018/01/15/%E4%BD%BF%E7%94%A8-Let-s-Encrypt-%E9%85%8D%E7%BD%AE-HTTPS/index.html">
+<meta property="og:site_name" content="Random Access">
+<meta property="og:description" content="HTTPS是一种更安全的访问网页的方式。简单介绍一下使用Let’s Encrypt来配置HTTPS。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-01-15T09:57:16.000Z">
+<meta property="article:modified_time" content="2024-11-13T05:54:14.501Z">
+<meta property="article:author" content="Eric Xu">
+<meta property="article:tag" content="hack">
+<meta name="twitter:card" content="summary">
+  <!-- canonical -->
+  
+  <link rel="canonical" href="http://blog.xubihang.name/2018/01/15/使用-Let-s-Encrypt-配置-HTTPS/">
+  
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="/img/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+  <!-- CSS -->
+  
+<link rel="stylesheet" href="/css/reset.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/markdown.css">
+
+  
+<link rel="stylesheet" href="/css/fonts.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div class="paper">
+            <div class="paper-main">
+                
+                    <div class="post-header">
+    <a class="logo" href="/">Random Access</a>
+    <!-- <div class="logo"><a href="/" title="Len"><img src="/img/logo.svg" alt="Len" aria-label="logo" height="20"></a></div> -->
+        <ul class="nav">
+            
+            <li><a href="/">Home</a></li>
+            
+            <li><a target="_blank" rel="noopener" href="https://xubihang.name">About</a></li>
+            
+            <li><a href="/archives">Archives</a></li>
+            
+            <li><a href="/atom.xml">RSS</a></li>
+            
+        </ul>
+
+
+    </a>
+</div>
+
+                
+                <div class="post-main">
+    
+        <div class="post-main-title">
+            使用 Let&#39;s Encrypt 配置 HTTPS
+        </div>
+        <div class="post-meta">
+            2018-01-15 ｜ 
+            
+        </div>
+        <!-- 圆角分类 -->
+        <!-- <div class="tags"> -->
+            <!--  -->
+        <!-- </div> -->
+        <div class="post-md">
+            <p>HTTPS是一种更安全的访问网页的方式。简单介绍一下使用Let’s Encrypt来配置HTTPS。</p>
+<span id="more"></span>
+
+<h2 id="Let’s-Encrypt-介绍"><a href="#Let’s-Encrypt-介绍" class="headerlink" title="Let’s Encrypt 介绍"></a>Let’s Encrypt 介绍</h2><p>HTTPS中关键的是其中的证书。证书的一个重要的前提，是需要通过国际公认的证书证书认证机构（简称CA，Certificate Authority）申请。当然可以自己生成证书而不通过CA（自己充当CA），但是这样生成的证书无法在其他人的浏览器中正常通过，会提示证书不可信。于是当前的目标便是找到一个获得免费证书的方式。而Let’s Encrypt就能提供这样的免费证书。<br>Let’s Encrypt[^1]是一个于2015年三季度推出的数字证书认证机构，旨在以自动化流程消除手动创建和安装证书的复杂流程，并推广使万维网服务器的加密连接无所不在，为安全网站提供免费的SSL&#x2F;TLS证书[^2]。</p>
+<h2 id="部署-Let’s-Encrypt-的证书"><a href="#部署-Let’s-Encrypt-的证书" class="headerlink" title="部署 Let’s Encrypt 的证书"></a>部署 Let’s Encrypt 的证书</h2><p>官方推荐使用一个叫做 Certbot 的工具来自动化部署。访问Certbot的<a target="_blank" rel="noopener" href="https://certbot.eff.org/">官方页面</a>，选择对应的服务器应用和系统后，根据提示安装。此处选择了在CentOS 7的Nginx上安装，页面提示的操作是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 终端中运行</span><br><span class="line">wget https://dl.eff.org/certbot-auto</span><br><span class="line">chmod a+x certbot-auto</span><br></pre></td></tr></table></figure>
+<p>而后在终端中执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 如果你的服务器正在对外提供服务，当前不能重启的话，执行如下命令：</span><br><span class="line">sudo ./path/to/certbot-auto --authenticator webroot --installer nginx </span><br><span class="line"># 如果可以重启：</span><br><span class="line">sudo ./path/to/certbot-auto --authenticator standalone --installer nginx --pre-hook &quot;nginx -s stop&quot; --post-hook &quot;nginx&quot;</span><br></pre></td></tr></table></figure>
+<p>中间过程中可以选择是否开启HTTP访问的自动跳转。如果开启后，用户访问HTTP的域名时，服务器会自动重定向到 HTTPS。建议开启。<br>一切执行完之后，证书已经正确部署了。可以尝试访问HTTPS的域名看看。</p>
+<h2 id="更新证书"><a href="#更新证书" class="headerlink" title="更新证书"></a>更新证书</h2><p>Let’s Encrypt的证书虽然免费，不过也有一个小小的弊端：证书需要3个月（90天）重新更新一下。同样的，这个动作可以使用Certbot来操作。同时还可以通过crontab来定时自动调用Certbot，完成自动更新：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 更新方式</span><br><span class="line">sudo ./path/to/certbot-auto renew</span><br><span class="line"># 自动更新的实现需要使用  crontab。编辑 crontab 配置</span><br><span class="line">sudo vim /etc/crontab</span><br><span class="line"># 新增配置 1月一次调用</span><br><span class="line">0 0 1 * * root /usr/bin/certbot renew  &gt;/dev/null 2&gt;&amp;1</span><br></pre></td></tr></table></figure>
+<p>[^1]: Let’s Encrypt 官方 about 页面 <a target="_blank" rel="noopener" href="https://letsencrypt.org/about/">https://letsencrypt.org/about/</a><br>[^2]: 来自 Wikipedia Let’s Encrypt 词条 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/Let%27s_Encrypt">https://zh.wikipedia.org/wiki/Let%27s_Encrypt</a></p>
+
+        </div>
+    
+<!-- tags -->
+
+    <div class="post-meta">
+        标签：
+        
+            <a href="/tags/hack/"> / hack</a>
+        
+    </div>
+
+</div>
+                <div class="footer">
+    <span>Copyright © 2023 Random Access</span>
+    <span>Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> with <a target="_blank" rel="noopener" href="https:///imzl.com/zenmind">ZenMind</a></span>
+</div>
+
+<link rel="stylesheet" href="/css/a11y-dark.min.css">
+
+
+<script src="/js/highlight.min.js"></script>
+
+
+<script src="/js/highlightjs-line-numbers.js"></script>
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+
+            </div>
+        </div>
+    </body>
+</html>

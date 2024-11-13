@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+    <head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <meta name="robots" content="index, follow">
+  <!-- title -->
+  
+    
+  <title>记一次大数估算 - Random Access</title>
+    
+  
+  
+  <!-- open graph -->
+  <meta name="description" content="之前在一次电话面试之后，对方提了一个估算的问题：  2017 年 25-35 男性在服装上的整体消费市场有多大（GMV）？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次大数估算">
+<meta property="og:url" content="http://blog.xubihang.name/2018/09/14/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%A4%A7%E6%95%B0%E4%BC%B0%E7%AE%97/index.html">
+<meta property="og:site_name" content="Random Access">
+<meta property="og:description" content="之前在一次电话面试之后，对方提了一个估算的问题：  2017 年 25-35 男性在服装上的整体消费市场有多大（GMV）？">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-09-14T06:16:15.000Z">
+<meta property="article:modified_time" content="2024-11-13T05:54:14.505Z">
+<meta property="article:author" content="Eric Xu">
+<meta property="article:tag" content="lifestyle">
+<meta property="article:tag" content="product">
+<meta name="twitter:card" content="summary">
+  <!-- canonical -->
+  
+  <link rel="canonical" href="http://blog.xubihang.name/2018/09/14/记一次大数估算/">
+  
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="/img/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+  <!-- CSS -->
+  
+<link rel="stylesheet" href="/css/reset.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/markdown.css">
+
+  
+<link rel="stylesheet" href="/css/fonts.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div class="paper">
+            <div class="paper-main">
+                
+                    <div class="post-header">
+    <a class="logo" href="/">Random Access</a>
+    <!-- <div class="logo"><a href="/" title="Len"><img src="/img/logo.svg" alt="Len" aria-label="logo" height="20"></a></div> -->
+        <ul class="nav">
+            
+            <li><a href="/">Home</a></li>
+            
+            <li><a target="_blank" rel="noopener" href="https://xubihang.name">About</a></li>
+            
+            <li><a href="/archives">Archives</a></li>
+            
+            <li><a href="/atom.xml">RSS</a></li>
+            
+        </ul>
+
+
+    </a>
+</div>
+
+                
+                <div class="post-main">
+    
+        <div class="post-main-title">
+            记一次大数估算
+        </div>
+        <div class="post-meta">
+            2018-09-14 ｜ 
+            
+        </div>
+        <!-- 圆角分类 -->
+        <!-- <div class="tags"> -->
+            <!--  -->
+        <!-- </div> -->
+        <div class="post-md">
+            <p>之前在一次电话面试之后，对方提了一个估算的问题：</p>
+<blockquote>
+<p>2017 年 25-35 男性在服装上的整体消费市场有多大（GMV）？</p>
+</blockquote>
+<span id="more"></span>
+
+<p>下面是我的计算过程：<br>整体的公式其实很简单，<strong>人数×人均频次×客单价&#x3D;GMV</strong>。接下来需要的就是逐步拆解，去找到能用的信息源。</p>
+<h3 id="关于人数"><a href="#关于人数" class="headerlink" title="关于人数"></a>关于人数</h3><ol>
+<li>依据国家统计局给出的人口年龄、男女比例的数据，估算2017年25-35的男性人口比例为 0.087，以14亿人口总数（2017年估算），该年龄段的人口数目约为 1.218 亿。</li>
+</ol>
+<blockquote>
+<p>以上数据源来自国家统计局，估算的方式的话使用的是之前几年数据的拟合。当然拟合的相当粗糙，不过应该不存在数量级的差异。</p>
+</blockquote>
+<h3 id="关于人均频次×客单价"><a href="#关于人均频次×客单价" class="headerlink" title="关于人均频次×客单价"></a>关于人均频次×客单价</h3><ol>
+<li>依据国家统计局给出的季度居民人均衣着消费支出，估算出 2017 年人均衣着支出约为 3400 元。</li>
+<li>人均衣着支出关于年龄的分布，可以猜测是正态分布，25-35 的居民很可能落在正态分布的峰值附近，其平均值与整体的平均值不存在数量级的差异，故可以认为 25-35 的居民 2017 年人均衣着支出也是 3400 元。</li>
+<li>25-35 的男女服装消费的比例有待确认，我这边没有可靠的估算数据来源，不过猜测不会有数量级的差异，故暂定假设是男女消费比例为 2:3。</li>
+</ol>
+<blockquote>
+<p>数据源同样来自国家统计局。其中关于平均值的计算可以看一下正态分布的曲线就能明白。</p>
+</blockquote>
+<h3 id="最后的结果"><a href="#最后的结果" class="headerlink" title="最后的结果"></a>最后的结果</h3><p>依上，可得出 25-35 男士的 2017 年总消费额约为 1.218 x 3400 x 2&#x2F;5 &#x3D; 1,656.48 约 1700 亿</p>
+<h3 id="Last-but-not-least"><a href="#Last-but-not-least" class="headerlink" title="Last but not least"></a>Last but not least</h3><p>这类问题，泛一点归类的话，可以归为所谓的<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%B4%B9%E7%B1%B3%E9%97%AE%E9%A2%98">费米问题</a>，Wikipedia 中的解释如下：</p>
+<blockquote>
+<p>在科学中，尤其是在物理和工程教育中，费米问题或费米估算是一个用来做量纲分析，估算和清晰地验证一个假设的估算问题。命名自恩里科·费米。这类问题通常涉及对于只给定有限的已知信息，而似乎是算不出来的量，作出合理的猜测。</p>
+</blockquote>
+<p>本质上，这类问题考验的不是实际的准确度。如果了解量纲分析的就知道，这个过程追求的是合理性，而不是准确的数值结果。那么考验的是什么呢？其实就是建模的能力，也就是对于实际问题抽象出模型并验证的能力。举例来说，上面这个问题本质上就考验了一个模型，人数×客单价&#x3D;GMV，后续的步骤只是依据这个模型找各种数据源来拼接出来结果；再举一个 Wikipedia 上的一个例子：</p>
+<blockquote>
+<p>在芝加哥有多少钢琴调琴师？<br>大约有9,000,000 人生活在芝加哥。<br>在芝加哥平均每个家庭有2个人。<br>大约在20个家庭中有1个家庭有定期地需要调钢琴。<br>定期调琴的钢琴每年需要调整一次。<br>每个调琴师大约需要2小时调琴，包括路上时间。<br>每个调琴师每天工作8小时，一周5天，一年50周。<br>通过这些假设我们可以计算出每年在芝加哥需要调整的钢琴数量是<br>(9,000,000 人在芝加哥) &#x2F; (2 人&#x2F;家) × (1 架钢琴&#x2F;20 家) × (1 架钢琴调整&#x2F;1年) &#x3D; 225,000 架钢琴在芝加哥每年被调整。<br>类似地计算出平均每个调琴师<br>(50 周&#x2F;年)×(5 天&#x2F;周)×(8 小时&#x2F;天)&#x2F;(1 架钢琴&#x2F;2小时) &#x3D; 1000 架钢琴每年&#x2F;1调琴师。<br>做除法得到<br>(225,000 架钢琴在芝加哥每年被调整) &#x2F; ( 1000 架钢琴每年&#x2F;1调琴师) &#x3D; 225 个调琴师在芝加哥。<br>事实上， 一共有大约290名调琴师在芝加哥。</p>
+</blockquote>
+<p>上面的整个计算过程，核心其实是最后一步，需要被调整的钢琴数÷每个钢琴师能cover的钢琴数&#x3D;钢琴师的数目。这个也是解决这个问题时建立的模型。当然拆解之后还有其他的模型，例如计算钢琴数目的时候，使用的是 人均数目×总人数 等等。<br>这类模型里面有一个挺出名的<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%BE%B7%E9%9B%B7%E5%85%8B%E5%85%AC%E5%BC%8F">德雷克公式</a>，用来推测可能与我们接触的银河系内外星球高智文明的数量。有趣的是，这个模型也可以用来解释<a target="_blank" rel="noopener" href="https://www.solidot.org/story?sid=15736">为什么你找不到女朋友</a>（滑稽</p>
+
+        </div>
+    
+<!-- tags -->
+
+    <div class="post-meta">
+        标签：
+        
+            <a href="/tags/lifestyle/"> / lifestyle</a>
+        
+            <a href="/tags/product/"> / product</a>
+        
+    </div>
+
+</div>
+                <div class="footer">
+    <span>Copyright © 2023 Random Access</span>
+    <span>Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> with <a target="_blank" rel="noopener" href="https:///imzl.com/zenmind">ZenMind</a></span>
+</div>
+
+<link rel="stylesheet" href="/css/a11y-dark.min.css">
+
+
+<script src="/js/highlight.min.js"></script>
+
+
+<script src="/js/highlightjs-line-numbers.js"></script>
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+
+            </div>
+        </div>
+    </body>
+</html>

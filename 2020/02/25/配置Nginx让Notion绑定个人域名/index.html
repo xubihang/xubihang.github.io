@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <meta name="robots" content="index, follow">
+  <!-- title -->
+  
+    
+  <title>一次用 Nginx 来绑定个人域名到 Notion 的折腾 - Random Access</title>
+    
+  
+  
+  <!-- open graph -->
+  <meta name="description" content="Notion.so 是一个备受瞩目的笔记产品。由于提供了丰富的样式及功能，许多人都用它来实现各种内容类的功能，笔记、日程、代办、任务看板、CRM、Wiki 等等。当然还有博客。但是一个不能绑定个人域名的博客工具，总是缺少了一些 hack 的乐趣。于此，要介绍一下使用 Nginx 来实现绑定个人域名到 Notion 的效果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次用 Nginx 来绑定个人域名到 Notion 的折腾">
+<meta property="og:url" content="http://blog.xubihang.name/2020/02/25/%E9%85%8D%E7%BD%AENginx%E8%AE%A9Notion%E7%BB%91%E5%AE%9A%E4%B8%AA%E4%BA%BA%E5%9F%9F%E5%90%8D/index.html">
+<meta property="og:site_name" content="Random Access">
+<meta property="og:description" content="Notion.so 是一个备受瞩目的笔记产品。由于提供了丰富的样式及功能，许多人都用它来实现各种内容类的功能，笔记、日程、代办、任务看板、CRM、Wiki 等等。当然还有博客。但是一个不能绑定个人域名的博客工具，总是缺少了一些 hack 的乐趣。于此，要介绍一下使用 Nginx 来实现绑定个人域名到 Notion 的效果。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-02-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-11-13T05:54:14.499Z">
+<meta property="article:author" content="Eric Xu">
+<meta property="article:tag" content="hack">
+<meta name="twitter:card" content="summary">
+  <!-- canonical -->
+  
+  <link rel="canonical" href="http://blog.xubihang.name/2020/02/25/配置Nginx让Notion绑定个人域名/">
+  
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="/img/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+  <!-- CSS -->
+  
+<link rel="stylesheet" href="/css/reset.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/markdown.css">
+
+  
+<link rel="stylesheet" href="/css/fonts.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div class="paper">
+            <div class="paper-main">
+                
+                    <div class="post-header">
+    <a class="logo" href="/">Random Access</a>
+    <!-- <div class="logo"><a href="/" title="Len"><img src="/img/logo.svg" alt="Len" aria-label="logo" height="20"></a></div> -->
+        <ul class="nav">
+            
+            <li><a href="/">Home</a></li>
+            
+            <li><a target="_blank" rel="noopener" href="https://xubihang.name">About</a></li>
+            
+            <li><a href="/archives">Archives</a></li>
+            
+            <li><a href="/atom.xml">RSS</a></li>
+            
+        </ul>
+
+
+    </a>
+</div>
+
+                
+                <div class="post-main">
+    
+        <div class="post-main-title">
+            一次用 Nginx 来绑定个人域名到 Notion 的折腾
+        </div>
+        <div class="post-meta">
+            2020-02-25 ｜ 
+            
+        </div>
+        <!-- 圆角分类 -->
+        <!-- <div class="tags"> -->
+            <!--  -->
+        <!-- </div> -->
+        <div class="post-md">
+            <p><a target="_blank" rel="noopener" href="https://www.notion.so/">Notion.so</a> 是一个备受瞩目的笔记产品。由于提供了丰富的样式及功能，许多人都用它来实现各种内容类的功能，笔记、日程、代办、任务看板、CRM、Wiki 等等。当然还有博客。但是一个不能绑定个人域名的博客工具，总是缺少了一些 hack 的乐趣。于此，要介绍一下使用 Nginx 来实现绑定个人域名到 Notion 的效果。</p>
+<span id="more"></span>
+
+<p>如果搜索一下的话会发现，市面上现在提供类似效果的，借助的都是 Cloudflare。方案看下来，一则是麻烦，且有牛刀杀鸡的感觉，二是感觉提供的效果，应该是可以用服务端应用来实现的，比如 Nginx 的反向代理等等，没必要额外再新增一个不熟悉的服务。碰巧我的 VPS 上就装了 Nginx，也用它配置了一些服务，于是便摸索试着用 Nginx 来配置。</p>
+<p>基础的想法都是将个人域名重定向到 Notion 里面一个公开的特定页面上，同时 URL 不变。Notion 的单页面的 URL 结构都是诸如 notion.so&#x2F;path-to-the-file-rfq32ravqatfeqf4f 这般，我试图用域名 xubihang.name 直接反代这个页面，结果无论我怎么配置，最终的效果都是成功跳转同时 URL 也发生了变化。而我又对 Nginx 配置不熟，而且对 Nginx 总有一种缺乏最佳实践的赌气心理而没有深入看过文档，于是陷入僵局。</p>
+<p>在我断断续续折腾了一周之后，在 GitHub 的一个角落里面找到了曙光。这个 <a target="_blank" rel="noopener" href="https://github.com/lobre/docker-notion-proxy">Repo:lobre&#x2F;docker-notion-proxy</a> 是一个 docker 的配置信息，用来实现个人域名绑定的效果。其中的 readme 解释了为什么直接绑定是不行的：</p>
+<blockquote>
+<p><strong>We cannot hide&#x2F;rewrite the URL for a clean root domain.</strong><br>For the What’s New public page for instance, we cannot have it directly under <a target="_blank" rel="noopener" href="http://example.com/">http://example.com</a>. We need the appended URI: <a target="_blank" rel="noopener" href="http://example.com/What-s-New-157765353f2c4705bd45474e5ba8b46c">http://example.com/What-s-New-157765353f2c4705bd45474e5ba8b46c</a>.<br>The reason is that Notion relies a lot on Javascript. The routing to a public page seems to be done dynamically using Javascript with window.location.href (actual browser URL) to parse which page should be displayed. So when pointing to <a target="_blank" rel="noopener" href="http://example.com/">http://example.com</a>, it will understand that it should display <a target="_blank" rel="noopener" href="http://www.notion.so/">http://www.notion.so</a> even if we proxy_pass to a custom page.<br>In order to still have a special page attached to the root domain, you can add the REDIRECT environment variable to set up a redirection on the root domain. So with our example after having set REDIRECT&#x3D;What-s-New-157765353f2c4705bd45474e5ba8b46c, hitting <a target="_blank" rel="noopener" href="http://example.com/">http://example.com</a> will 302 redirect to <a target="_blank" rel="noopener" href="http://example.com/What-s-New-157765353f2c4705bd45474e5ba8b46c">http://example.com/What-s-New-157765353f2c4705bd45474e5ba8b46c</a>.</p>
+</blockquote>
+<p>……行吧。于是照着里面的配置项，整理了一下 Nginx 下的配置。具体配置如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">        server_name  yourdomain.com;</span><br><span class="line">        location / &#123;</span><br><span class="line">        proxy_buffer_size 64k;</span><br><span class="line">        proxy_buffers   32 32k;</span><br><span class="line">        proxy_busy_buffers_size 128k;</span><br><span class="line">        rewrite ^/$ http://yourdomain.com/the-gibberish-url-direct-to-the-notion-page-fewafedawfedfa;</span><br><span class="line">        proxy_pass https://www.notion.so;</span><br><span class="line">        proxy_set_header Host www.notion.so;</span><br><span class="line">        proxy_set_header Referer https://www.notion.so;</span><br><span class="line">        proxy_set_header User-Agent $http_user_agent;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header Accept-Encoding &quot;&quot;;</span><br><span class="line">        proxy_set_header Accept-Language $http_accept_language;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        sub_filter https://www.notion.so https://yourdomain.com;</span><br><span class="line">        sub_filter_once off;</span><br><span class="line">        sub_filter_types application/javascript;</span><br><span class="line">        proxy_ssl_server_name on;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>Repo里面的配置项没有这个：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">proxy_buffer_size 64k;</span><br><span class="line">proxy_buffers   32 32k;</span><br><span class="line">proxy_busy_buffers_size 128k;</span><br></pre></td></tr></table></figure>
+<p>起初没加，结果发现域名点开 404。后来看了一下 Nginx 的报错日志，Google 了一番原因，发现是反代默认的 buffer 太小，页面太大就失败了。增大之后就不存在该问题。另外还有可能出现的一个问题是 Nginx 服务无法访问某些目录导致无法成功加载，这个的话只要把对应目录的权限开放给启动 Nginx 的用户，或者简单粗暴直接把启动用户设置为 root 就可以解决。</p>
+<p>至此域名已经绑定成功。可以体验我 host 在 Notion.so 的<a target="_blank" rel="noopener" href="http://xubihang.name/">个人主页</a>。</p>
+
+        </div>
+    
+<!-- tags -->
+
+    <div class="post-meta">
+        标签：
+        
+            <a href="/tags/hack/"> / hack</a>
+        
+    </div>
+
+</div>
+                <div class="footer">
+    <span>Copyright © 2023 Random Access</span>
+    <span>Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> with <a target="_blank" rel="noopener" href="https:///imzl.com/zenmind">ZenMind</a></span>
+</div>
+
+<link rel="stylesheet" href="/css/a11y-dark.min.css">
+
+
+<script src="/js/highlight.min.js"></script>
+
+
+<script src="/js/highlightjs-line-numbers.js"></script>
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+
+            </div>
+        </div>
+    </body>
+</html>
