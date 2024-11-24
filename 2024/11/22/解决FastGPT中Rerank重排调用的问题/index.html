@@ -19,11 +19,13 @@
 <meta property="og:site_name" content="Random Access">
 <meta property="og:description" content="公司内的AI项目在用FastGPT做编排调度。升级到新版本后发现使用知识库召回时，重排&#x2F;rerank始终没有生效。我来回折腾了一天最终搞定了这个问题，在这里记录一下解决方案。 怎么发现的问题其实之前我们部署了一个v4.6.7版本FastGPT用于业务（别问为什么是这个版本：部署的时候恰好是这个，上线了太多项目后又不敢升级了），里面测试知识库都显示重排生效。于是我复制了旧的config配置">
 <meta property="og:locale">
+<meta property="og:image" content="http://blog.xubihang.name/Pasted%20image%2020241124214136.png">
 <meta property="article:published_time" content="2024-11-22T05:54:29.000Z">
-<meta property="article:modified_time" content="2024-11-24T13:34:09.732Z">
+<meta property="article:modified_time" content="2024-11-24T13:41:37.836Z">
 <meta property="article:author" content="Eric Xu">
 <meta property="article:tag" content="hack">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.xubihang.name/Pasted%20image%2020241124214136.png">
   <!-- canonical -->
   
   <link rel="canonical" href="http://blog.xubihang.name/2024/11/22/解决FastGPT中Rerank重排调用的问题/">
@@ -86,7 +88,7 @@
         <div class="post-md">
             <p>公司内的AI项目在用<a target="_blank" rel="noopener" href="https://github.com/labring/FastGPT">FastGPT</a>做编排调度。升级到新版本后发现使用知识库召回时，重排&#x2F;rerank始终没有生效。我来回折腾了一天最终搞定了这个问题，在这里记录一下解决方案。</p>
 <h1 id="怎么发现的问题"><a href="#怎么发现的问题" class="headerlink" title="怎么发现的问题"></a>怎么发现的问题</h1><p>其实之前我们部署了一个v4.6.7版本FastGPT用于业务（别问为什么是这个版本：部署的时候恰好是这个，上线了太多项目后又不敢升级了），里面测试知识库都显示重排生效。于是我复制了旧的config配置，按照FastGPT文档中新版本的要求修改好，放到了新部署的最新版本FastGPT config里面，想着这总不会错吧。结果新版下测试直接提示重排失败。</p>
-<h1 id="排查和解决过程"><a href="#排查和解决过程" class="headerlink" title="排查和解决过程"></a>排查和解决过程</h1><p>整个问题基本上就是在FastGPT的github issue里面翻别人的经验的过程。不得不说这个项目的文档写得太滞后了。这种情况下，群友（？）可能有话要说了：<br>![[Pasted image 20241124205728.png]]</p>
+<h1 id="排查和解决过程"><a href="#排查和解决过程" class="headerlink" title="排查和解决过程"></a>排查和解决过程</h1><p>整个问题基本上就是在FastGPT的github issue里面翻别人的经验的过程。不得不说这个项目的文档写得太滞后了。这种情况下，群友（？）可能有话要说了：<br><img src="/Pasted%20image%2020241124214136.png"></p>
 <p>回归正题。文档中默认的rerank模型是<a target="_blank" rel="noopener" href="https://doc.tryfastgpt.ai/docs/development/custom-models/bge-rerank/">bge-rerank</a>，我们之前也是按照文档部署的，按照文档默认选择了v0.1版本。然后我就发现新版本的FastGPT居然要求bge-rerank需要使用v0.2版本，而这一点完全没有在文档中提现，仅能从<a target="_blank" rel="noopener" href="https://github.com/labring/FastGPT/issues/1094">issue中找到</a>（其实更让我看得莫名其妙的是<a target="_blank" rel="noopener" href="https://github.com/labring/FastGPT/issues/1085">这个issue</a>，好像大家都已经知道了需要升级，好像只有我一个人搞不清状况(which is, happend a lot of times, sadly)）。</p>
 <p>于是重新部署了一个v0.2的版本。对了，不能使用文档中的<a target="_blank" rel="noopener" href="https://doc.tryfastgpt.ai/docs/development/custom-models/bge-rerank/#docker-%e9%83%a8%e7%bd%b2">docker镜像地址</a>直接改v0.2，因为这个地址里面就没有v0.2版本的文件。需要使用 registry.cn-hangzhou.aliyuncs.com&#x2F;fastgpt&#x2F;rerank:v0.2 来下载镜像。</p>
 <p>成功启动bge-rerank后，如果是从旧版本升级过来的话会遇到最后一个问题，bge-rerank的请求路径有变化，原本是 api&#x2F;v1&#x2F;rerank，新版本没有api&#x2F;了，是 v1&#x2F;rerank（当然文档里面也没有说，最后还是从<a target="_blank" rel="noopener" href="https://github.com/labring/FastGPT/issues/1085">这里</a>找到的。不对文档说了，但没有提示调整，所以基本等于没说）。</p>
